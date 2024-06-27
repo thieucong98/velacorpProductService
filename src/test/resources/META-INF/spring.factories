@@ -1,0 +1,3 @@
+org.springframework.test.context.ContextCustomizerFactory = com.velacorp.\
+    product.config.SqlTestContainersSpringContextCustomizerFactory,com.velacorp.\
+    product.config.KafkaTestContainersSpringContextCustomizerFactory
