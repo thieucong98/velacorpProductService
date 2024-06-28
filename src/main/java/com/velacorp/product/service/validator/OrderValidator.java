@@ -19,7 +19,7 @@ public class OrderValidator {
                         if (product == null) {
                             throw new IllegalArgumentException("Product with id " + orderItemDTO.getProductId() + " does not exist");
                         }
-                        if (orderItemDTO.getQuantity() < orderItemDTO.getQuantity()) {
+                        if (product.getQuantity() < orderItemDTO.getQuantity()) {
                             throw new IllegalArgumentException(
                                 "Product with id " + orderItemDTO.getProductId() + " does not have enough quantity"
                             );

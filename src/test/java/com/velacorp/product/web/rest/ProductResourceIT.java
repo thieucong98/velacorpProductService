@@ -35,6 +35,9 @@ class ProductResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
+    private static final Long DEFAULT_QUANTITY = 0L;
+    private static final Long UPDATED_QUANTITY = 1L;
+
     private static final Double DEFAULT_PRICE = 0D;
     private static final Double UPDATED_PRICE = 1D;
 
@@ -76,7 +79,12 @@ class ProductResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Product createEntity(EntityManager em) {
-        Product product = new Product().name(DEFAULT_NAME).price(DEFAULT_PRICE).active(DEFAULT_ACTIVE).imageUrl(DEFAULT_IMAGE_URL);
+        Product product = new Product()
+            .name(DEFAULT_NAME)
+            .quantity(DEFAULT_QUANTITY)
+            .price(DEFAULT_PRICE)
+            .active(DEFAULT_ACTIVE)
+            .imageUrl(DEFAULT_IMAGE_URL);
         return product;
     }
 
@@ -87,7 +95,12 @@ class ProductResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Product createUpdatedEntity(EntityManager em) {
-        Product product = new Product().name(UPDATED_NAME).price(UPDATED_PRICE).active(UPDATED_ACTIVE).imageUrl(UPDATED_IMAGE_URL);
+        Product product = new Product()
+            .name(UPDATED_NAME)
+            .quantity(UPDATED_QUANTITY)
+            .price(UPDATED_PRICE)
+            .active(UPDATED_ACTIVE)
+            .imageUrl(UPDATED_IMAGE_URL);
         return product;
     }
 
@@ -201,6 +214,8 @@ class ProductResourceIT {
             .value(hasItem(product.getId().intValue()))
             .jsonPath("$.[*].name")
             .value(hasItem(DEFAULT_NAME))
+            .jsonPath("$.[*].quantity")
+            .value(hasItem(DEFAULT_QUANTITY.intValue()))
             .jsonPath("$.[*].price")
             .value(hasItem(DEFAULT_PRICE.doubleValue()))
             .jsonPath("$.[*].active")
@@ -229,6 +244,8 @@ class ProductResourceIT {
             .value(is(product.getId().intValue()))
             .jsonPath("$.name")
             .value(is(DEFAULT_NAME))
+            .jsonPath("$.quantity")
+            .value(is(DEFAULT_QUANTITY.intValue()))
             .jsonPath("$.price")
             .value(is(DEFAULT_PRICE.doubleValue()))
             .jsonPath("$.active")
@@ -258,7 +275,12 @@ class ProductResourceIT {
 
         // Update the product
         Product updatedProduct = productRepository.findById(product.getId()).block();
-        updatedProduct.name(UPDATED_NAME).price(UPDATED_PRICE).active(UPDATED_ACTIVE).imageUrl(UPDATED_IMAGE_URL);
+        updatedProduct
+            .name(UPDATED_NAME)
+            .quantity(UPDATED_QUANTITY)
+            .price(UPDATED_PRICE)
+            .active(UPDATED_ACTIVE)
+            .imageUrl(UPDATED_IMAGE_URL);
         ProductDTO productDTO = productMapper.toDto(updatedProduct);
 
         webTestClient
@@ -352,7 +374,7 @@ class ProductResourceIT {
         Product partialUpdatedProduct = new Product();
         partialUpdatedProduct.setId(product.getId());
 
-        partialUpdatedProduct.name(UPDATED_NAME).active(UPDATED_ACTIVE).imageUrl(UPDATED_IMAGE_URL);
+        partialUpdatedProduct.name(UPDATED_NAME).price(UPDATED_PRICE).active(UPDATED_ACTIVE);
 
         webTestClient
             .patch()
@@ -380,7 +402,12 @@ class ProductResourceIT {
         Product partialUpdatedProduct = new Product();
         partialUpdatedProduct.setId(product.getId());
 
-        partialUpdatedProduct.name(UPDATED_NAME).price(UPDATED_PRICE).active(UPDATED_ACTIVE).imageUrl(UPDATED_IMAGE_URL);
+        partialUpdatedProduct
+            .name(UPDATED_NAME)
+            .quantity(UPDATED_QUANTITY)
+            .price(UPDATED_PRICE)
+            .active(UPDATED_ACTIVE)
+            .imageUrl(UPDATED_IMAGE_URL);
 
         webTestClient
             .patch()

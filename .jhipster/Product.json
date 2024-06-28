@@ -17,6 +17,12 @@
       "fieldValidateRules": ["required"]
     },
     {
+      "fieldName": "quantity",
+      "fieldType": "Long",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
       "fieldName": "price",
       "fieldType": "Double",
       "fieldValidateRules": ["min"],

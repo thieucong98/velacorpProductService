@@ -385,4 +385,12 @@ public class Order implements Serializable {
             ", rejectReason='" + getRejectReason() + "'" +
             "}";
     }
+
+    public void calculateTotal() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem orderItem : orderItems) {
+            total = total.add(orderItem.getProductPrice().multiply(new BigDecimal(orderItem.getQuantity())));
+        }
+        this.totalPrice = total;
+    }
 }

@@ -23,6 +23,10 @@ public class Product implements Serializable {
     @Column("name")
     private String name;
 
+    @Min(value = 0L)
+    @Column("quantity")
+    private Long quantity;
+
     @DecimalMin(value = "0")
     @Column("price")
     private Double price;
@@ -59,6 +63,19 @@ public class Product implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getQuantity() {
+        return this.quantity;
+    }
+
+    public Product quantity(Long quantity) {
+        this.setQuantity(quantity);
+        return this;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
     }
 
     public Double getPrice() {
@@ -125,6 +142,7 @@ public class Product implements Serializable {
         return "Product{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", quantity=" + getQuantity() +
             ", price=" + getPrice() +
             ", active='" + getActive() + "'" +
             ", imageUrl='" + getImageUrl() + "'" +

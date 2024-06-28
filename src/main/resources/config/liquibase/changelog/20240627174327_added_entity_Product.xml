@@ -17,6 +17,9 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
+            <column name="quantity" type="bigint">
+                <constraints nullable="true" />
+            </column>
             <column name="price" type="double">
                 <constraints nullable="true" />
             </column>
@@ -48,6 +51,7 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
+            <column name="quantity" type="numeric"/>
             <column name="price" type="numeric"/>
             <column name="active" type="boolean"/>
             <column name="image_url" type="string"/>

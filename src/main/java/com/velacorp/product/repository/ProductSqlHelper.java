@@ -12,6 +12,7 @@ public class ProductSqlHelper {
         List<Expression> columns = new ArrayList<>();
         columns.add(Column.aliased("id", table, columnPrefix + "_id"));
         columns.add(Column.aliased("name", table, columnPrefix + "_name"));
+        columns.add(Column.aliased("quantity", table, columnPrefix + "_quantity"));
         columns.add(Column.aliased("price", table, columnPrefix + "_price"));
         columns.add(Column.aliased("active", table, columnPrefix + "_active"));
         columns.add(Column.aliased("image_url", table, columnPrefix + "_image_url"));

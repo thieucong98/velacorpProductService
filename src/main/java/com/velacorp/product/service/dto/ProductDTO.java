@@ -15,6 +15,9 @@ public class ProductDTO implements Serializable {
     @NotNull(message = "must not be null")
     private String name;
 
+    @Min(value = 0L)
+    private Long quantity;
+
     @DecimalMin(value = "0")
     private Double price;
 
@@ -36,6 +39,14 @@ public class ProductDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
     }
 
     public Double getPrice() {
@@ -89,6 +100,7 @@ public class ProductDTO implements Serializable {
         return "ProductDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", quantity=" + getQuantity() +
             ", price=" + getPrice() +
             ", active='" + getActive() + "'" +
             ", imageUrl='" + getImageUrl() + "'" +

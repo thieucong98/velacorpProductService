@@ -1,5 +1,6 @@
 package com.velacorp.product.service.impl;
 
+import com.velacorp.product.domain.Order;
 import com.velacorp.product.domain.OrderItem;
 import com.velacorp.product.repository.OrderItemRepository;
 import com.velacorp.product.repository.OrderRepository;
@@ -47,9 +48,11 @@ public class OrderServiceImpl implements OrderService {
         if (!this.orderValidator.validate(orderDTO)) {
             return Mono.error(new IllegalArgumentException("Order is not valid"));
         }
+        Order entity = orderMapper.toEntity(orderDTO);
+        entity.calculateTotal();
 
         return orderRepository
-            .save(orderMapper.toEntity(orderDTO))
+            .save(entity)
             .map(orderMapper::toDto)
             .map(order -> {
                 Set<OrderItemDTO> orderItems = orderDTO.getOrderItems();
@@ -67,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
                         productRepository
                             .findById(orderItem.getProductId())
                             .subscribe(product -> {
-                                //                        product.setQuantity(product.getQuantity() - orderItem.getQuantity());
+                                product.setQuantity(product.getQuantity() - orderItem.getQuantity());
                                 productRepository.save(product).subscribe();
                             });
                     });
