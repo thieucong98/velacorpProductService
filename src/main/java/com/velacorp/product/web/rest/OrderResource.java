@@ -3,6 +3,7 @@ package com.velacorp.product.web.rest;
 import com.velacorp.product.repository.OrderRepository;
 import com.velacorp.product.service.OrderService;
 import com.velacorp.product.service.dto.OrderDTO;
+import com.velacorp.product.viewmodel.order.OrderGetVM;
 import com.velacorp.product.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -79,7 +80,7 @@ public class OrderResource {
     /**
      * {@code PUT  /orders/:id} : Updates an existing order.
      *
-     * @param id the id of the orderDTO to save.
+     * @param id       the id of the orderDTO to save.
      * @param orderDTO the orderDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
      * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
@@ -121,7 +122,7 @@ public class OrderResource {
     /**
      * {@code PATCH  /orders/:id} : Partial updates given fields of an existing order, field will ignore if it is null
      *
-     * @param id the id of the orderDTO to save.
+     * @param id       the id of the orderDTO to save.
      * @param orderDTO the orderDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
      * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
@@ -166,18 +167,19 @@ public class OrderResource {
      * {@code GET  /orders} : get all the orders.
      *
      * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
+     * @param request  a {@link ServerHttpRequest} request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<List<OrderDTO>>> getAllOrders(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @org.springdoc.core.annotations.ParameterObject OrderGetVM query,
         ServerHttpRequest request
     ) {
         log.debug("REST request to get a page of Orders");
         return orderService
             .countAll()
-            .zipWith(orderService.findAll(pageable).collectList())
+            .zipWith(orderService.findAll(query, pageable).collectList())
             .map(
                 countWithEntities ->
                     ResponseEntity.ok()

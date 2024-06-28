@@ -1,6 +1,7 @@
 package com.velacorp.product.service;
 
 import com.velacorp.product.service.dto.OrderDTO;
+import com.velacorp.product.viewmodel.order.OrderGetVM;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -63,4 +64,6 @@ public interface OrderService {
      * @return a Mono to signal the deletion
      */
     Mono<Void> delete(Long id);
+
+    Flux<OrderDTO> findAll(OrderGetVM query, Pageable pageable);
 }

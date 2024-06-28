@@ -11,9 +11,11 @@ import com.velacorp.product.service.dto.OrderItemDTO;
 import com.velacorp.product.service.mapper.OrderItemMapper;
 import com.velacorp.product.service.mapper.OrderMapper;
 import com.velacorp.product.service.validator.OrderValidator;
+import com.velacorp.product.viewmodel.order.OrderGetVM;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +105,19 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public Flux<OrderDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Orders");
+        return orderRepository.findAllBy(pageable).map(orderMapper::toDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Flux<OrderDTO> findAll(OrderGetVM query, Pageable pageable) {
+        log.debug("Request to get all Orders");
+        if (query != null && query.getId() != null) {
+            return orderRepository.findAllById(query.getId(), pageable).map(orderMapper::toDto);
+        }
+        if (query != null && StringUtils.isNotBlank(query.getEmail())) {
+            return orderRepository.findAllByEmail(query.getEmail(), pageable).map(orderMapper::toDto);
+        }
         return orderRepository.findAllBy(pageable).map(orderMapper::toDto);
     }
 

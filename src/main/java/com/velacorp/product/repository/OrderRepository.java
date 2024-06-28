@@ -26,6 +26,10 @@ public interface OrderRepository extends ReactiveCrudRepository<Order, Long>, Or
 
     @Override
     Mono<Void> deleteById(Long id);
+
+    Flux<Order> findAllByEmail(String email, Pageable pageable);
+
+    Flux<Order> findAllById(Long id, Pageable pageable);
 }
 
 interface OrderRepositoryInternal {
