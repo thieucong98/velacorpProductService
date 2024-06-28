@@ -110,7 +110,7 @@ spring:
         binder:
           replicationFactor: 1
           auto-create-topics: true
-          brokers: localhost:9092
+          brokers: kafka:9092
       bindings:
         binding-out-0:
           content-type: text/plain
