@@ -12,9 +12,9 @@ import com.velacorp.product.service.mapper.OrderItemMapper;
 import com.velacorp.product.service.mapper.OrderMapper;
 import com.velacorp.product.service.validator.OrderValidator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +45,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Mono<OrderDTO> save(OrderDTO orderDTO) {
         log.debug("Request to save Order : {}", orderDTO);
-        if (!this.orderValidator.validate(orderDTO)) {
-            return Mono.error(new IllegalArgumentException("Order is not valid"));
-        }
+        return this.orderValidator.validate(orderDTO).then(doSave(orderDTO));
+    }
+
+    private @NotNull Mono<OrderDTO> doSave(OrderDTO orderDTO) {
         Order entity = orderMapper.toEntity(orderDTO);
         entity.calculateTotal();
-
         return orderRepository
             .save(entity)
             .map(orderMapper::toDto)
