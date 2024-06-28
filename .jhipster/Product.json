@@ -1,0 +1,35 @@
+{
+  "annotations": {
+    "changelogDate": "20240627174327"
+  },
+  "applications": "*",
+  "clientRootFolder": "velacorpProductService",
+  "databaseType": "sql",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "price",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
+    },
+    {
+      "fieldName": "active",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "imageUrl",
+      "fieldType": "String"
+    }
+  ],
+  "microserviceName": "velacorpProductService",
+  "name": "Product",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

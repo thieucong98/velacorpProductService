@@ -57,14 +57,17 @@ public class SecurityConfiguration {
                     // prettier-ignore
                 authz
                     .pathMatchers("/api/authenticate").permitAll()
-                    .pathMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .pathMatchers("/api/**").authenticated()
-                    .pathMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .pathMatchers("/api/admin/**").permitAll()
+                    .pathMatchers("/api/**").permitAll()
+//                    .pathMatchers("/api/**").authenticated()
+//                    .pathMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .pathMatchers("/v3/api-docs/**").permitAll()
                     .pathMatchers("/management/health").permitAll()
                     .pathMatchers("/management/health/**").permitAll()
                     .pathMatchers("/management/info").permitAll()
                     .pathMatchers("/management/prometheus").permitAll()
-                    .pathMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+//                    .pathMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .pathMatchers("/management/**").permitAll()
             )
             .httpBasic(basic -> basic.disable())
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));

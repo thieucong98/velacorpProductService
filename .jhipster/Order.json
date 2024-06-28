@@ -1,0 +1,97 @@
+{
+  "annotations": {
+    "changelogDate": "20240627174328"
+  },
+  "applications": "*",
+  "clientRootFolder": "velacorpProductService",
+  "databaseType": "sql",
+  "entityTableName": "jhi_order",
+  "fields": [
+    {
+      "fieldName": "email",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "shippingAddressId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "billingAddressId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "note",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "tax",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "discount",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "numberItem",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "couponCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "totalPrice",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "deliveryFee",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "orderStatus",
+      "fieldType": "OrderStatus",
+      "fieldValues": "PENDING,ACCEPTED,PENDING_PAYMENT,PAID,SHIPPING,COMPLETED,REFUND,CANCELLED,REJECT"
+    },
+    {
+      "fieldName": "deliveryMethod",
+      "fieldType": "DeliveryMethod",
+      "fieldValues": "VIETTEL_POST,GRAB_EXPRESS,SHOPEE_EXPRESS,YAS_EXPRESS"
+    },
+    {
+      "fieldName": "deliveryStatus",
+      "fieldType": "DeliveryStatus",
+      "fieldValues": "PREPARING,DELIVERING,DELIVERED,CANCELLED"
+    },
+    {
+      "fieldName": "paymentStatus",
+      "fieldType": "PaymentStatus",
+      "fieldValues": "PENDING,COMPLETED,CANCELLED"
+    },
+    {
+      "fieldName": "paymentId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "checkoutId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "rejectReason",
+      "fieldType": "String"
+    }
+  ],
+  "microserviceName": "velacorpProductService",
+  "name": "Order",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "orderItem",
+      "otherEntityRelationshipName": "order",
+      "relationshipName": "orderItem",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

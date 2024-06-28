@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Order.
+    -->
+    <changeSet id="20240627174328-1" author="jhipster">
+        <createTable tableName="jhi_order">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1500">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="shipping_address_id" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="billing_address_id" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="note" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="tax" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="discount" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="number_item" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="coupon_code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="total_price" type="decimal(21,2)">
+                <constraints nullable="true" />
+            </column>
+            <column name="delivery_fee" type="decimal(21,2)">
+                <constraints nullable="true" />
+            </column>
+            <column name="order_status" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="delivery_method" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="delivery_status" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="payment_status" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="payment_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="checkout_id" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="reject_reason" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20240627174328-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/jhi_order.csv"
+                  separator=";"
+                  tableName="jhi_order"
+                  usePreparedStatements="true">
+            <column name="id" type="numeric"/>
+            <column name="email" type="string"/>
+            <column name="shipping_address_id" type="string"/>
+            <column name="billing_address_id" type="string"/>
+            <column name="note" type="string"/>
+            <column name="tax" type="numeric"/>
+            <column name="discount" type="numeric"/>
+            <column name="number_item" type="numeric"/>
+            <column name="coupon_code" type="string"/>
+            <column name="total_price" type="numeric"/>
+            <column name="delivery_fee" type="numeric"/>
+            <column name="order_status" type="string"/>
+            <column name="delivery_method" type="string"/>
+            <column name="delivery_status" type="string"/>
+            <column name="payment_status" type="string"/>
+            <column name="payment_id" type="numeric"/>
+            <column name="checkout_id" type="string"/>
+            <column name="reject_reason" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

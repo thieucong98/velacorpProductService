@@ -1,0 +1,93 @@
+
+
+
+
+enum CheckoutState {
+    COMPLETED, PENDING,  LOCK
+}
+
+enum DeliveryMethod {
+    VIETTEL_POST, GRAB_EXPRESS, SHOPEE_EXPRESS, YAS_EXPRESS
+}
+
+enum DeliveryStatus {
+    PREPARING,
+    DELIVERING,
+    DELIVERED,
+    CANCELLED
+}
+
+enum OrderStatus {
+    PENDING,
+    ACCEPTED,
+    PENDING_PAYMENT,
+    PAID,
+    SHIPPING,
+    COMPLETED,
+    REFUND,
+    CANCELLED,
+
+    REJECT
+}
+
+enum PaymentMethod {
+    COD, BANKING
+}
+
+enum PaymentStatus {
+    PENDING,
+    COMPLETED,
+    CANCELLED
+}
+
+
+entity Product {
+
+    name String required,
+    price Double min(0),
+    active Boolean,
+    imageUrl String
+}
+entity Order{
+
+email String ,
+shippingAddressId String ,
+billingAddressId String ,
+note String ,
+tax Float ,
+discount Float ,
+numberItem Integer ,
+couponCode String ,
+totalPrice BigDecimal ,
+deliveryFee BigDecimal ,
+orderStatus OrderStatus ,
+deliveryMethod DeliveryMethod ,
+deliveryStatus DeliveryStatus ,
+paymentStatus PaymentStatus ,
+paymentId Long ,
+checkoutId String ,
+rejectReason String ,
+}
+
+entity OrderItem{
+
+productId Long,
+productName String,
+quantity Integer,
+productPrice BigDecimal,
+note String,
+discountAmount BigDecimal,
+taxAmount BigDecimal,
+taxPercent BigDecimal,
+}
+
+relationship OneToMany {
+   Order{orderItem} to OrderItem{order(id) required}
+}
+
+
+
+service Order, Product with serviceClass
+paginate Order, Product with pagination
+
+

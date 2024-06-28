@@ -1,0 +1,56 @@
+{
+  "annotations": {
+    "changelogDate": "20240627174329"
+  },
+  "applications": "*",
+  "clientRootFolder": "velacorpProductService",
+  "databaseType": "sql",
+  "fields": [
+    {
+      "fieldName": "productId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "productName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "quantity",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "productPrice",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "note",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "discountAmount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "taxAmount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "taxPercent",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "microserviceName": "velacorpProductService",
+  "name": "OrderItem",
+  "relationships": [
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "orderItem",
+      "relationshipName": "order",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no"
+}

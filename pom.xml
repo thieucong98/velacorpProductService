@@ -49,7 +49,7 @@
         <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
         <liquibase-plugin.password/>
         <liquibase-plugin.url/>
-        <liquibase-plugin.username/>
+        <liquibase-plugin.username>root</liquibase-plugin.username>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
         <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
