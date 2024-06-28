@@ -1,124 +1,37 @@
 package com.velacorp.product.service;
 
-import com.velacorp.product.domain.Order;
-import com.velacorp.product.domain.OrderItem;
-import com.velacorp.product.repository.OrderItemRepository;
-import com.velacorp.product.repository.OrderRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.velacorp.product.service.dto.OrderDTO;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Service Implementation for managing {@link com.velacorp.product.domain.Order}.
+ * Service Interface for managing {@link com.velacorp.product.domain.Order}.
  */
-@Service
-@Transactional
-public class OrderService {
-
-    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
-
-    private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
-
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-    }
-
+public interface OrderService {
     /**
      * Save a order.
      *
-     * @param order the entity to save.
+     * @param orderDTO the entity to save.
      * @return the persisted entity.
      */
-    public Mono<Order> save(Order order) {
-        log.debug("Request to save Order : {}", order);
-        return orderRepository.save(order);
-    }
+    Mono<OrderDTO> save(OrderDTO orderDTO);
 
     /**
-     * Update a order.
+     * Updates a order.
      *
-     * @param order the entity to save.
+     * @param orderDTO the entity to update.
      * @return the persisted entity.
      */
-    public Mono<Order> update(Order order) {
-        log.debug("Request to update Order : {}", order);
-        return orderRepository.save(order);
-    }
+    Mono<OrderDTO> update(OrderDTO orderDTO);
 
     /**
-     * Partially update a order.
+     * Partially updates a order.
      *
-     * @param order the entity to update partially.
+     * @param orderDTO the entity to update partially.
      * @return the persisted entity.
      */
-    public Mono<Order> partialUpdate(Order order) {
-        log.debug("Request to partially update Order : {}", order);
-
-        return orderRepository
-            .findById(order.getId())
-            .map(existingOrder -> {
-                if (order.getEmail() != null) {
-                    existingOrder.setEmail(order.getEmail());
-                }
-                if (order.getShippingAddressId() != null) {
-                    existingOrder.setShippingAddressId(order.getShippingAddressId());
-                }
-                if (order.getBillingAddressId() != null) {
-                    existingOrder.setBillingAddressId(order.getBillingAddressId());
-                }
-                if (order.getNote() != null) {
-                    existingOrder.setNote(order.getNote());
-                }
-                if (order.getTax() != null) {
-                    existingOrder.setTax(order.getTax());
-                }
-                if (order.getDiscount() != null) {
-                    existingOrder.setDiscount(order.getDiscount());
-                }
-                if (order.getNumberItem() != null) {
-                    existingOrder.setNumberItem(order.getNumberItem());
-                }
-                if (order.getCouponCode() != null) {
-                    existingOrder.setCouponCode(order.getCouponCode());
-                }
-                if (order.getTotalPrice() != null) {
-                    existingOrder.setTotalPrice(order.getTotalPrice());
-                }
-                if (order.getDeliveryFee() != null) {
-                    existingOrder.setDeliveryFee(order.getDeliveryFee());
-                }
-                if (order.getOrderStatus() != null) {
-                    existingOrder.setOrderStatus(order.getOrderStatus());
-                }
-                if (order.getDeliveryMethod() != null) {
-                    existingOrder.setDeliveryMethod(order.getDeliveryMethod());
-                }
-                if (order.getDeliveryStatus() != null) {
-                    existingOrder.setDeliveryStatus(order.getDeliveryStatus());
-                }
-                if (order.getPaymentStatus() != null) {
-                    existingOrder.setPaymentStatus(order.getPaymentStatus());
-                }
-                if (order.getPaymentId() != null) {
-                    existingOrder.setPaymentId(order.getPaymentId());
-                }
-                if (order.getCheckoutId() != null) {
-                    existingOrder.setCheckoutId(order.getCheckoutId());
-                }
-                if (order.getRejectReason() != null) {
-                    existingOrder.setRejectReason(order.getRejectReason());
-                }
-
-                return existingOrder;
-            })
-            .flatMap(orderRepository::save);
-    }
+    Mono<OrderDTO> partialUpdate(OrderDTO orderDTO);
 
     /**
      * Get all the orders.
@@ -126,52 +39,28 @@ public class OrderService {
      * @param pageable the pagination information.
      * @return the list of entities.
      */
-    @Transactional(readOnly = true)
-    public Flux<Order> findAll(Pageable pageable) {
-        log.debug("Request to get all Orders");
-        Flux<Order> allBy = orderRepository.findAllBy(pageable);
-        return allBy;
-    }
+    Flux<OrderDTO> findAll(Pageable pageable);
 
     /**
      * Returns the number of orders available.
-     *
      * @return the number of entities in the database.
+     *
      */
-    public Mono<Long> countAll() {
-        return orderRepository.count();
-    }
+    Mono<Long> countAll();
 
     /**
-     * Get one order by id.
+     * Get the "id" order.
      *
      * @param id the id of the entity.
      * @return the entity.
      */
-    @Transactional(readOnly = true)
-    public Mono<Order> findOne(Long id) {
-        log.debug("Request to get Order : {}", id);
-        return orderRepository.findById(id).map(this::apply);
-    }
+    Mono<OrderDTO> findOne(Long id);
 
     /**
-     * Delete the order by id.
+     * Delete the "id" order.
      *
      * @param id the id of the entity.
      * @return a Mono to signal the deletion
      */
-    public Mono<Void> delete(Long id) {
-        log.debug("Request to delete Order : {}", id);
-        return orderRepository.deleteById(id);
-    }
-
-    private Order apply(Order order) {
-        this.orderItemRepository.findByOrder(order.getId())
-            .collectList()
-            .subscribe(orderItems -> {
-                order.getOrderItems().addAll(orderItems);
-            });
-
-        return order;
-    }
+    Mono<Void> delete(Long id);
 }

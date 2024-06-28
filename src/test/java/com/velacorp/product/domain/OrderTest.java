@@ -32,18 +32,14 @@ class OrderTest {
 
         order.addOrderItem(orderItemBack);
         assertThat(order.getOrderItems()).containsOnly(orderItemBack);
-        assertThat(orderItemBack.getOrder()).isEqualTo(order);
 
         order.removeOrderItem(orderItemBack);
         assertThat(order.getOrderItems()).doesNotContain(orderItemBack);
-        assertThat(orderItemBack.getOrder()).isNull();
 
         order.orderItems(new HashSet<>(Set.of(orderItemBack)));
         assertThat(order.getOrderItems()).containsOnly(orderItemBack);
-        assertThat(orderItemBack.getOrder()).isEqualTo(order);
 
         order.setOrderItems(new HashSet<>());
         assertThat(order.getOrderItems()).doesNotContain(orderItemBack);
-        assertThat(orderItemBack.getOrder()).isNull();
     }
 }

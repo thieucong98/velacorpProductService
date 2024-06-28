@@ -5,6 +5,7 @@
   "applications": "*",
   "clientRootFolder": "velacorpProductService",
   "databaseType": "sql",
+  "dto": "mapstruct",
   "fields": [
     {
       "fieldName": "productId",
@@ -41,9 +42,10 @@
   ],
   "microserviceName": "velacorpProductService",
   "name": "OrderItem",
+  "pagination": "pagination",
   "relationships": [
     {
-      "otherEntityField": "id",
+      "otherEntityField": "email",
       "otherEntityName": "order",
       "otherEntityRelationshipName": "orderItem",
       "relationshipName": "order",
@@ -52,5 +54,6 @@
       "relationshipValidateRules": "required"
     }
   ],
-  "searchEngine": "no"
+  "searchEngine": "no",
+  "service": "serviceImpl"
 }

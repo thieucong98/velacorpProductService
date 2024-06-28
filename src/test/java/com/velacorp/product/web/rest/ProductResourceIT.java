@@ -11,6 +11,8 @@ import com.velacorp.product.IntegrationTest;
 import com.velacorp.product.domain.Product;
 import com.velacorp.product.repository.EntityManager;
 import com.velacorp.product.repository.ProductRepository;
+import com.velacorp.product.service.dto.ProductDTO;
+import com.velacorp.product.service.mapper.ProductMapper;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
@@ -53,6 +55,9 @@ class ProductResourceIT {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @Autowired
     private EntityManager em;
@@ -112,20 +117,22 @@ class ProductResourceIT {
     void createProduct() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Product
-        var returnedProduct = webTestClient
+        ProductDTO productDTO = productMapper.toDto(product);
+        var returnedProductDTO = webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(Product.class)
+            .expectBody(ProductDTO.class)
             .returnResult()
             .getResponseBody();
 
         // Validate the Product in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedProduct = productMapper.toEntity(returnedProductDTO);
         assertProductUpdatableFieldsEquals(returnedProduct, getPersistedProduct(returnedProduct));
 
         insertedProduct = returnedProduct;
@@ -135,6 +142,7 @@ class ProductResourceIT {
     void createProductWithExistingId() throws Exception {
         // Create the Product with an existing ID
         product.setId(1L);
+        ProductDTO productDTO = productMapper.toDto(product);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
@@ -143,7 +151,7 @@ class ProductResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -159,12 +167,13 @@ class ProductResourceIT {
         product.setName(null);
 
         // Create the Product, which fails.
+        ProductDTO productDTO = productMapper.toDto(product);
 
         webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -250,12 +259,13 @@ class ProductResourceIT {
         // Update the product
         Product updatedProduct = productRepository.findById(product.getId()).block();
         updatedProduct.name(UPDATED_NAME).price(UPDATED_PRICE).active(UPDATED_ACTIVE).imageUrl(UPDATED_IMAGE_URL);
+        ProductDTO productDTO = productMapper.toDto(updatedProduct);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedProduct.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(updatedProduct))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -270,12 +280,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, product.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -289,12 +302,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -308,12 +324,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -383,12 +402,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, product.getId())
+            .uri(ENTITY_API_URL_ID, productDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -402,12 +424,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -421,12 +446,15 @@ class ProductResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         product.setId(longCount.incrementAndGet());
 
+        // Create the Product
+        ProductDTO productDTO = productMapper.toDto(product);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(product))
+            .bodyValue(om.writeValueAsBytes(productDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

@@ -5,7 +5,12 @@
   "applications": "*",
   "clientRootFolder": "velacorpProductService",
   "databaseType": "sql",
+  "dto": "mapstruct",
   "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Long"
+    },
     {
       "fieldName": "name",
       "fieldType": "String",
@@ -31,5 +36,5 @@
   "pagination": "pagination",
   "relationships": [],
   "searchEngine": "no",
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }

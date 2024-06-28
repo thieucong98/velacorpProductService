@@ -22,16 +22,4 @@ class OrderItemTest {
         orderItem2 = getOrderItemSample2();
         assertThat(orderItem1).isNotEqualTo(orderItem2);
     }
-
-    @Test
-    void orderTest() {
-        OrderItem orderItem = getOrderItemRandomSampleGenerator();
-        Order orderBack = getOrderRandomSampleGenerator();
-
-        orderItem.setOrder(orderBack);
-        assertThat(orderItem.getOrder()).isEqualTo(orderBack);
-
-        orderItem.order(null);
-        assertThat(orderItem.getOrder()).isNull();
-    }
 }

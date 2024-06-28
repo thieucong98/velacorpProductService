@@ -76,6 +76,7 @@
         <spotless-maven-plugin.version>2.43.0</spotless-maven-plugin.version>
         <spring-cloud-dependencies.version>2023.0.2</spring-cloud-dependencies.version>
         <springdoc-openapi-starter-webflux-api.version>2.5.0</springdoc-openapi-starter-webflux-api.version>
+        <org.lombok.version>1.18.30</org.lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -344,6 +345,11 @@
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${org.lombok.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -575,6 +581,11 @@
                             <path>
                                 <groupId>org.glassfish.jaxb</groupId>
                                 <artifactId>jaxb-runtime</artifactId>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${org.lombok.version}</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>

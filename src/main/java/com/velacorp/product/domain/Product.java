@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
  */
 @Table("product")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Product extends AbstractAuditingEntity<Long> implements Serializable {
+public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

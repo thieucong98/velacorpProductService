@@ -13,3 +13,7 @@ services:
     extends:
       file: ./kafka.yml
       service: zookeeper
+  swagger:
+    extends:
+      file: ./swagger-editor.yml.yml
+      service: swagger

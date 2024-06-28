@@ -16,6 +16,8 @@ import com.velacorp.product.domain.enumeration.OrderStatus;
 import com.velacorp.product.domain.enumeration.PaymentStatus;
 import com.velacorp.product.repository.EntityManager;
 import com.velacorp.product.repository.OrderRepository;
+import com.velacorp.product.service.dto.OrderDTO;
+import com.velacorp.product.service.mapper.OrderMapper;
 import java.math.BigDecimal;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -98,6 +100,9 @@ class OrderResourceIT {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Autowired
     private EntityManager em;
@@ -191,20 +196,22 @@ class OrderResourceIT {
     void createOrder() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Order
-        var returnedOrder = webTestClient
+        OrderDTO orderDTO = orderMapper.toDto(order);
+        var returnedOrderDTO = webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(Order.class)
+            .expectBody(OrderDTO.class)
             .returnResult()
             .getResponseBody();
 
         // Validate the Order in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedOrder = orderMapper.toEntity(returnedOrderDTO);
         assertOrderUpdatableFieldsEquals(returnedOrder, getPersistedOrder(returnedOrder));
 
         insertedOrder = returnedOrder;
@@ -214,6 +221,7 @@ class OrderResourceIT {
     void createOrderWithExistingId() throws Exception {
         // Create the Order with an existing ID
         order.setId(1L);
+        OrderDTO orderDTO = orderMapper.toDto(order);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
@@ -222,13 +230,34 @@ class OrderResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
 
         // Validate the Order in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
+    }
+
+    @Test
+    void checkEmailIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        order.setEmail(null);
+
+        // Create the Order, which fails.
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
+        webTestClient
+            .post()
+            .uri(ENTITY_API_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(om.writeValueAsBytes(orderDTO))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
@@ -378,12 +407,13 @@ class OrderResourceIT {
             .paymentId(UPDATED_PAYMENT_ID)
             .checkoutId(UPDATED_CHECKOUT_ID)
             .rejectReason(UPDATED_REJECT_REASON);
+        OrderDTO orderDTO = orderMapper.toDto(updatedOrder);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedOrder.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(updatedOrder))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -398,12 +428,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, order.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -417,12 +450,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -436,12 +472,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -536,12 +575,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, order.getId())
+            .uri(ENTITY_API_URL_ID, orderDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -555,12 +597,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -574,12 +619,15 @@ class OrderResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         order.setId(longCount.incrementAndGet());
 
+        // Create the Order
+        OrderDTO orderDTO = orderMapper.toDto(order);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(order))
+            .bodyValue(om.writeValueAsBytes(orderDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

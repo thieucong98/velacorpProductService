@@ -1,6 +1,6 @@
-package com.velacorp.product.domain;
+package com.velacorp.product.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.velacorp.product.domain.OrderItem;
 import com.velacorp.product.domain.enumeration.DeliveryMethod;
 import com.velacorp.product.domain.enumeration.DeliveryStatus;
 import com.velacorp.product.domain.enumeration.OrderStatus;
@@ -9,89 +9,56 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * A Order.
+ * A DTO for the {@link com.velacorp.product.domain.Order} entity.
  */
-@Table("jhi_order")
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class Order implements Serializable {
+public class OrderDTO implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    @Id
-    @Column("id")
     private Long id;
 
     @NotNull(message = "must not be null")
-    @Column("email")
     private String email;
 
-    @Column("shipping_address_id")
     private String shippingAddressId;
 
-    @Column("billing_address_id")
     private String billingAddressId;
 
-    @Column("note")
     private String note;
 
-    @Column("tax")
     private Float tax;
 
-    @Column("discount")
     private Float discount;
 
-    @Column("number_item")
     private Integer numberItem;
 
-    @Column("coupon_code")
     private String couponCode;
 
-    @Column("total_price")
     private BigDecimal totalPrice;
 
-    @Column("delivery_fee")
     private BigDecimal deliveryFee;
 
-    @Column("order_status")
     private OrderStatus orderStatus;
 
-    @Column("delivery_method")
     private DeliveryMethod deliveryMethod;
 
-    @Column("delivery_status")
     private DeliveryStatus deliveryStatus;
 
-    @Column("payment_status")
     private PaymentStatus paymentStatus;
 
-    @Column("payment_id")
     private Long paymentId;
 
-    @Column("checkout_id")
     private String checkoutId;
 
-    @Column("reject_reason")
     private String rejectReason;
 
-    @Transient
-    private Set<OrderItem> orderItems = new HashSet<>();
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    private Set<OrderItemDTO> orderItems = new HashSet<>();
 
     public Long getId() {
-        return this.id;
-    }
-
-    public Order id(Long id) {
-        this.setId(id);
-        return this;
+        return id;
     }
 
     public void setId(Long id) {
@@ -99,12 +66,7 @@ public class Order implements Serializable {
     }
 
     public String getEmail() {
-        return this.email;
-    }
-
-    public Order email(String email) {
-        this.setEmail(email);
-        return this;
+        return email;
     }
 
     public void setEmail(String email) {
@@ -112,12 +74,7 @@ public class Order implements Serializable {
     }
 
     public String getShippingAddressId() {
-        return this.shippingAddressId;
-    }
-
-    public Order shippingAddressId(String shippingAddressId) {
-        this.setShippingAddressId(shippingAddressId);
-        return this;
+        return shippingAddressId;
     }
 
     public void setShippingAddressId(String shippingAddressId) {
@@ -125,12 +82,7 @@ public class Order implements Serializable {
     }
 
     public String getBillingAddressId() {
-        return this.billingAddressId;
-    }
-
-    public Order billingAddressId(String billingAddressId) {
-        this.setBillingAddressId(billingAddressId);
-        return this;
+        return billingAddressId;
     }
 
     public void setBillingAddressId(String billingAddressId) {
@@ -138,12 +90,7 @@ public class Order implements Serializable {
     }
 
     public String getNote() {
-        return this.note;
-    }
-
-    public Order note(String note) {
-        this.setNote(note);
-        return this;
+        return note;
     }
 
     public void setNote(String note) {
@@ -151,12 +98,7 @@ public class Order implements Serializable {
     }
 
     public Float getTax() {
-        return this.tax;
-    }
-
-    public Order tax(Float tax) {
-        this.setTax(tax);
-        return this;
+        return tax;
     }
 
     public void setTax(Float tax) {
@@ -164,12 +106,7 @@ public class Order implements Serializable {
     }
 
     public Float getDiscount() {
-        return this.discount;
-    }
-
-    public Order discount(Float discount) {
-        this.setDiscount(discount);
-        return this;
+        return discount;
     }
 
     public void setDiscount(Float discount) {
@@ -177,12 +114,7 @@ public class Order implements Serializable {
     }
 
     public Integer getNumberItem() {
-        return this.numberItem;
-    }
-
-    public Order numberItem(Integer numberItem) {
-        this.setNumberItem(numberItem);
-        return this;
+        return numberItem;
     }
 
     public void setNumberItem(Integer numberItem) {
@@ -190,12 +122,7 @@ public class Order implements Serializable {
     }
 
     public String getCouponCode() {
-        return this.couponCode;
-    }
-
-    public Order couponCode(String couponCode) {
-        this.setCouponCode(couponCode);
-        return this;
+        return couponCode;
     }
 
     public void setCouponCode(String couponCode) {
@@ -203,38 +130,23 @@ public class Order implements Serializable {
     }
 
     public BigDecimal getTotalPrice() {
-        return this.totalPrice;
-    }
-
-    public Order totalPrice(BigDecimal totalPrice) {
-        this.setTotalPrice(totalPrice);
-        return this;
+        return totalPrice;
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice != null ? totalPrice.stripTrailingZeros() : null;
+        this.totalPrice = totalPrice;
     }
 
     public BigDecimal getDeliveryFee() {
-        return this.deliveryFee;
-    }
-
-    public Order deliveryFee(BigDecimal deliveryFee) {
-        this.setDeliveryFee(deliveryFee);
-        return this;
+        return deliveryFee;
     }
 
     public void setDeliveryFee(BigDecimal deliveryFee) {
-        this.deliveryFee = deliveryFee != null ? deliveryFee.stripTrailingZeros() : null;
+        this.deliveryFee = deliveryFee;
     }
 
     public OrderStatus getOrderStatus() {
-        return this.orderStatus;
-    }
-
-    public Order orderStatus(OrderStatus orderStatus) {
-        this.setOrderStatus(orderStatus);
-        return this;
+        return orderStatus;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
@@ -242,12 +154,7 @@ public class Order implements Serializable {
     }
 
     public DeliveryMethod getDeliveryMethod() {
-        return this.deliveryMethod;
-    }
-
-    public Order deliveryMethod(DeliveryMethod deliveryMethod) {
-        this.setDeliveryMethod(deliveryMethod);
-        return this;
+        return deliveryMethod;
     }
 
     public void setDeliveryMethod(DeliveryMethod deliveryMethod) {
@@ -255,12 +162,7 @@ public class Order implements Serializable {
     }
 
     public DeliveryStatus getDeliveryStatus() {
-        return this.deliveryStatus;
-    }
-
-    public Order deliveryStatus(DeliveryStatus deliveryStatus) {
-        this.setDeliveryStatus(deliveryStatus);
-        return this;
+        return deliveryStatus;
     }
 
     public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
@@ -268,12 +170,7 @@ public class Order implements Serializable {
     }
 
     public PaymentStatus getPaymentStatus() {
-        return this.paymentStatus;
-    }
-
-    public Order paymentStatus(PaymentStatus paymentStatus) {
-        this.setPaymentStatus(paymentStatus);
-        return this;
+        return paymentStatus;
     }
 
     public void setPaymentStatus(PaymentStatus paymentStatus) {
@@ -281,12 +178,7 @@ public class Order implements Serializable {
     }
 
     public Long getPaymentId() {
-        return this.paymentId;
-    }
-
-    public Order paymentId(Long paymentId) {
-        this.setPaymentId(paymentId);
-        return this;
+        return paymentId;
     }
 
     public void setPaymentId(Long paymentId) {
@@ -294,12 +186,7 @@ public class Order implements Serializable {
     }
 
     public String getCheckoutId() {
-        return this.checkoutId;
-    }
-
-    public Order checkoutId(String checkoutId) {
-        this.setCheckoutId(checkoutId);
-        return this;
+        return checkoutId;
     }
 
     public void setCheckoutId(String checkoutId) {
@@ -307,64 +194,51 @@ public class Order implements Serializable {
     }
 
     public String getRejectReason() {
-        return this.rejectReason;
-    }
-
-    public Order rejectReason(String rejectReason) {
-        this.setRejectReason(rejectReason);
-        return this;
+        return rejectReason;
     }
 
     public void setRejectReason(String rejectReason) {
         this.rejectReason = rejectReason;
     }
 
-    public Set<OrderItem> getOrderItems() {
-        return this.orderItems;
+    public Set<OrderItemDTO> getOrderItems() {
+        return orderItems;
     }
 
-    public void setOrderItems(Set<OrderItem> orderItems) {
+    public void setOrderItems(Set<OrderItemDTO> orderItems) {
         this.orderItems = orderItems;
     }
 
-    public Order orderItems(Set<OrderItem> orderItems) {
-        this.setOrderItems(orderItems);
-        return this;
-    }
-
-    public Order addOrderItem(OrderItem orderItem) {
+    public OrderDTO addOrderItem(OrderItemDTO orderItem) {
         this.orderItems.add(orderItem);
         return this;
     }
-
-    public Order removeOrderItem(OrderItem orderItem) {
-        this.orderItems.remove(orderItem);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Order)) {
+        if (!(o instanceof OrderDTO)) {
             return false;
         }
-        return getId() != null && getId().equals(((Order) o).getId());
+
+        OrderDTO orderDTO = (OrderDTO) o;
+        if (this.id == null) {
+            return false;
+        }
+        return Objects.equals(this.id, orderDTO.id);
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hash(this.id);
     }
 
     // prettier-ignore
     @Override
     public String toString() {
-        return "Order{" +
+        return "OrderDTO{" +
             "id=" + getId() +
             ", email='" + getEmail() + "'" +
             ", shippingAddressId='" + getShippingAddressId() + "'" +

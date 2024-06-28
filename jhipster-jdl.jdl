@@ -42,52 +42,55 @@ enum PaymentStatus {
 
 
 entity Product {
-
+    id Long,
     name String required,
+    quantity Long min(0),
     price Double min(0),
     active Boolean,
     imageUrl String
 }
 entity Order{
-
-email String ,
-shippingAddressId String ,
-billingAddressId String ,
-note String ,
-tax Float ,
-discount Float ,
-numberItem Integer ,
-couponCode String ,
-totalPrice BigDecimal ,
-deliveryFee BigDecimal ,
-orderStatus OrderStatus ,
-deliveryMethod DeliveryMethod ,
-deliveryStatus DeliveryStatus ,
-paymentStatus PaymentStatus ,
-paymentId Long ,
-checkoutId String ,
-rejectReason String ,
+    id Long,
+    email String required
+    shippingAddressId String ,
+    billingAddressId String ,
+    note String ,
+    tax Float ,
+    discount Float ,
+    numberItem Integer ,
+    couponCode String ,
+    totalPrice BigDecimal ,
+    deliveryFee BigDecimal ,
+    orderStatus OrderStatus ,
+    deliveryMethod DeliveryMethod ,
+    deliveryStatus DeliveryStatus ,
+    paymentStatus PaymentStatus ,
+    paymentId Long ,
+    checkoutId String ,
+    rejectReason String ,
 }
 
 entity OrderItem{
-
-productId Long,
-productName String,
-quantity Integer,
-productPrice BigDecimal,
-note String,
-discountAmount BigDecimal,
-taxAmount BigDecimal,
-taxPercent BigDecimal,
+    productId Long,
+    productName String,
+    quantity Integer,
+    productPrice BigDecimal,
+    note String,
+    discountAmount BigDecimal,
+    taxAmount BigDecimal,
+    taxPercent BigDecimal,
 }
+
 
 relationship OneToMany {
-   Order{orderItem} to OrderItem{order(id) required}
+   Order{orderItem} to OrderItem{order(email) required}
 }
 
 
 
-service Order, Product with serviceClass
-paginate Order, Product with pagination
+
+dto * with mapstruct
+service * with serviceImpl
+paginate * with pagination
 
 

@@ -24,7 +24,6 @@ public class OrderItemAsserts {
      */
     public static void assertOrderItemAllUpdatablePropertiesEquals(OrderItem expected, OrderItem actual) {
         assertOrderItemUpdatableFieldsEquals(expected, actual);
-        assertOrderItemUpdatableRelationshipsEquals(expected, actual);
     }
 
     /**
@@ -77,17 +76,5 @@ public class OrderItemAsserts {
                         .usingComparator(bigDecimalCompareTo)
                         .isEqualTo(actual.getTaxPercent())
             );
-    }
-
-    /**
-     * Asserts that the entity has all the updatable relationships set.
-     *
-     * @param expected the expected entity
-     * @param actual the actual entity
-     */
-    public static void assertOrderItemUpdatableRelationshipsEquals(OrderItem expected, OrderItem actual) {
-        assertThat(expected)
-            .as("Verify OrderItem relationships")
-            .satisfies(e -> assertThat(e.getOrder()).as("check order").isEqualTo(actual.getOrder()));
     }
 }

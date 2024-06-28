@@ -1,7 +1,9 @@
 package com.velacorp.product.repository;
 
 import com.velacorp.product.domain.Product;
+import com.velacorp.product.viewmodel.product.ProductGetVM;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -26,6 +28,9 @@ public interface ProductRepository extends ReactiveCrudRepository<Product, Long>
 
     @Override
     Mono<Void> deleteById(Long id);
+
+    @Query("SELECT * FROM product entity WHERE entity.name like concat('%',:name, '%') ")
+    Flux<Product> findAllByNameLike(String name, Pageable pageable);
 }
 
 interface ProductRepositoryInternal {

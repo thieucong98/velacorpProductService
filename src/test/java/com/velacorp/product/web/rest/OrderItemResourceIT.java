@@ -6,6 +6,7 @@ import static com.velacorp.product.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.velacorp.product.IntegrationTest;
@@ -13,24 +14,30 @@ import com.velacorp.product.domain.Order;
 import com.velacorp.product.domain.OrderItem;
 import com.velacorp.product.repository.EntityManager;
 import com.velacorp.product.repository.OrderItemRepository;
+import com.velacorp.product.service.OrderItemService;
+import com.velacorp.product.service.dto.OrderItemDTO;
+import com.velacorp.product.service.mapper.OrderItemMapper;
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 
 /**
  * Integration tests for the {@link OrderItemResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_ENTITY_TIMEOUT)
 @WithMockUser
 class OrderItemResourceIT {
@@ -71,6 +78,15 @@ class OrderItemResourceIT {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Mock
+    private OrderItemRepository orderItemRepositoryMock;
+
+    @Autowired
+    private OrderItemMapper orderItemMapper;
+
+    @Mock
+    private OrderItemService orderItemServiceMock;
+
     @Autowired
     private EntityManager em;
 
@@ -100,7 +116,6 @@ class OrderItemResourceIT {
         // Add required entity
         Order order;
         order = em.insert(OrderResourceIT.createEntity(em)).block();
-        orderItem.setOrder(order);
         return orderItem;
     }
 
@@ -123,7 +138,6 @@ class OrderItemResourceIT {
         // Add required entity
         Order order;
         order = em.insert(OrderResourceIT.createUpdatedEntity(em)).block();
-        orderItem.setOrder(order);
         return orderItem;
     }
 
@@ -154,20 +168,22 @@ class OrderItemResourceIT {
     void createOrderItem() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the OrderItem
-        var returnedOrderItem = webTestClient
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+        var returnedOrderItemDTO = webTestClient
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isCreated()
-            .expectBody(OrderItem.class)
+            .expectBody(OrderItemDTO.class)
             .returnResult()
             .getResponseBody();
 
         // Validate the OrderItem in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedOrderItem = orderItemMapper.toEntity(returnedOrderItemDTO);
         assertOrderItemUpdatableFieldsEquals(returnedOrderItem, getPersistedOrderItem(returnedOrderItem));
 
         insertedOrderItem = returnedOrderItem;
@@ -177,6 +193,7 @@ class OrderItemResourceIT {
     void createOrderItemWithExistingId() throws Exception {
         // Create the OrderItem with an existing ID
         orderItem.setId(1L);
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
@@ -185,42 +202,13 @@ class OrderItemResourceIT {
             .post()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
 
         // Validate the OrderItem in the database
         assertSameRepositoryCount(databaseSizeBeforeCreate);
-    }
-
-    @Test
-    void getAllOrderItemsAsStream() {
-        // Initialize the database
-        orderItemRepository.save(orderItem).block();
-
-        List<OrderItem> orderItemList = webTestClient
-            .get()
-            .uri(ENTITY_API_URL)
-            .accept(MediaType.APPLICATION_NDJSON)
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectHeader()
-            .contentTypeCompatibleWith(MediaType.APPLICATION_NDJSON)
-            .returnResult(OrderItem.class)
-            .getResponseBody()
-            .filter(orderItem::equals)
-            .collectList()
-            .block(Duration.ofSeconds(5));
-
-        assertThat(orderItemList).isNotNull();
-        assertThat(orderItemList).hasSize(1);
-        OrderItem testOrderItem = orderItemList.get(0);
-
-        // Test fails because reactive api returns an empty object instead of null
-        // assertOrderItemAllPropertiesEquals(orderItem, testOrderItem);
-        assertOrderItemUpdatableFieldsEquals(orderItem, testOrderItem);
     }
 
     @Test
@@ -257,6 +245,23 @@ class OrderItemResourceIT {
             .value(hasItem(sameNumber(DEFAULT_TAX_AMOUNT)))
             .jsonPath("$.[*].taxPercent")
             .value(hasItem(sameNumber(DEFAULT_TAX_PERCENT)));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllOrderItemsWithEagerRelationshipsIsEnabled() {
+        when(orderItemServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri(ENTITY_API_URL + "?eagerload=true").exchange().expectStatus().isOk();
+
+        verify(orderItemServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllOrderItemsWithEagerRelationshipsIsNotEnabled() {
+        when(orderItemServiceMock.findAllWithEagerRelationships(any())).thenReturn(Flux.empty());
+
+        webTestClient.get().uri(ENTITY_API_URL + "?eagerload=false").exchange().expectStatus().isOk();
+        verify(orderItemRepositoryMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test
@@ -325,12 +330,13 @@ class OrderItemResourceIT {
             .discountAmount(UPDATED_DISCOUNT_AMOUNT)
             .taxAmount(UPDATED_TAX_AMOUNT)
             .taxPercent(UPDATED_TAX_PERCENT);
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(updatedOrderItem);
 
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, updatedOrderItem.getId())
+            .uri(ENTITY_API_URL_ID, orderItemDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(updatedOrderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isOk();
@@ -345,12 +351,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .put()
-            .uri(ENTITY_API_URL_ID, orderItem.getId())
+            .uri(ENTITY_API_URL_ID, orderItemDTO.getId())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -364,12 +373,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -383,12 +395,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .put()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);
@@ -469,12 +484,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
-            .uri(ENTITY_API_URL_ID, orderItem.getId())
+            .uri(ENTITY_API_URL_ID, orderItemDTO.getId())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -488,12 +506,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL_ID, longCount.incrementAndGet())
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isBadRequest();
@@ -507,12 +528,15 @@ class OrderItemResourceIT {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         orderItem.setId(longCount.incrementAndGet());
 
+        // Create the OrderItem
+        OrderItemDTO orderItemDTO = orderItemMapper.toDto(orderItem);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         webTestClient
             .patch()
             .uri(ENTITY_API_URL)
             .contentType(MediaType.valueOf("application/merge-patch+json"))
-            .bodyValue(om.writeValueAsBytes(orderItem))
+            .bodyValue(om.writeValueAsBytes(orderItemDTO))
             .exchange()
             .expectStatus()
             .isEqualTo(405);

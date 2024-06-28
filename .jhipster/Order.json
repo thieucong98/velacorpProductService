@@ -5,11 +5,17 @@
   "applications": "*",
   "clientRootFolder": "velacorpProductService",
   "databaseType": "sql",
+  "dto": "mapstruct",
   "entityTableName": "jhi_order",
   "fields": [
     {
+      "fieldName": "id",
+      "fieldType": "Long"
+    },
+    {
       "fieldName": "email",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "shippingAddressId",
@@ -93,5 +99,5 @@
     }
   ],
   "searchEngine": "no",
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }

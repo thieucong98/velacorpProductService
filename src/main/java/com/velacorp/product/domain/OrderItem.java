@@ -1,11 +1,8 @@
 package com.velacorp.product.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -45,10 +42,6 @@ public class OrderItem implements Serializable {
 
     @Column("tax_percent")
     private BigDecimal taxPercent;
-
-    @Transient
-    @JsonIgnoreProperties(value = { "orderItems" }, allowSetters = true)
-    private Order order;
 
     @Column("order_id")
     private Long orderId;
@@ -170,20 +163,6 @@ public class OrderItem implements Serializable {
 
     public void setTaxPercent(BigDecimal taxPercent) {
         this.taxPercent = taxPercent != null ? taxPercent.stripTrailingZeros() : null;
-    }
-
-    public Order getOrder() {
-        return this.order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-        this.orderId = order != null ? order.getId() : null;
-    }
-
-    public OrderItem order(Order order) {
-        this.setOrder(order);
-        return this;
     }
 
     public Long getOrderId() {

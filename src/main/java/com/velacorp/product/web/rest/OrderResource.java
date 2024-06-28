@@ -1,9 +1,11 @@
 package com.velacorp.product.web.rest;
 
-import com.velacorp.product.domain.Order;
 import com.velacorp.product.repository.OrderRepository;
 import com.velacorp.product.service.OrderService;
+import com.velacorp.product.service.dto.OrderDTO;
 import com.velacorp.product.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -51,18 +53,18 @@ public class OrderResource {
     /**
      * {@code POST  /orders} : Create a new order.
      *
-     * @param order the order to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
+     * @param orderDTO the orderDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new orderDTO, or with status {@code 400 (Bad Request)} if the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public Mono<ResponseEntity<Order>> createOrder(@RequestBody Order order) throws URISyntaxException {
-        log.debug("REST request to save Order : {}", order);
-        if (order.getId() != null) {
+    public Mono<ResponseEntity<OrderDTO>> createOrder(@Valid @RequestBody OrderDTO orderDTO) throws URISyntaxException {
+        log.debug("REST request to save Order : {}", orderDTO);
+        if (orderDTO.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
         return orderService
-            .save(order)
+            .save(orderDTO)
             .map(result -> {
                 try {
                     return ResponseEntity.created(new URI("/api/orders/" + result.getId()))
@@ -77,21 +79,23 @@ public class OrderResource {
     /**
      * {@code PUT  /orders/:id} : Updates an existing order.
      *
-     * @param id the id of the order to save.
-     * @param order the order to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated order,
-     * or with status {@code 400 (Bad Request)} if the order is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
+     * @param id the id of the orderDTO to save.
+     * @param orderDTO the orderDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
+     * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the orderDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Order>> updateOrder(@PathVariable(value = "id", required = false) final Long id, @RequestBody Order order)
-        throws URISyntaxException {
-        log.debug("REST request to update Order : {}, {}", id, order);
-        if (order.getId() == null) {
+    public Mono<ResponseEntity<OrderDTO>> updateOrder(
+        @PathVariable(value = "id", required = false) final Long id,
+        @Valid @RequestBody OrderDTO orderDTO
+    ) throws URISyntaxException {
+        log.debug("REST request to update Order : {}, {}", id, orderDTO);
+        if (orderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, order.getId())) {
+        if (!Objects.equals(id, orderDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -103,7 +107,7 @@ public class OrderResource {
                 }
 
                 return orderService
-                    .update(order)
+                    .update(orderDTO)
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                     .map(
                         result ->
@@ -117,24 +121,24 @@ public class OrderResource {
     /**
      * {@code PATCH  /orders/:id} : Partial updates given fields of an existing order, field will ignore if it is null
      *
-     * @param id the id of the order to save.
-     * @param order the order to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated order,
-     * or with status {@code 400 (Bad Request)} if the order is not valid,
-     * or with status {@code 404 (Not Found)} if the order is not found,
-     * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
+     * @param id the id of the orderDTO to save.
+     * @param orderDTO the orderDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated orderDTO,
+     * or with status {@code 400 (Bad Request)} if the orderDTO is not valid,
+     * or with status {@code 404 (Not Found)} if the orderDTO is not found,
+     * or with status {@code 500 (Internal Server Error)} if the orderDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public Mono<ResponseEntity<Order>> partialUpdateOrder(
+    public Mono<ResponseEntity<OrderDTO>> partialUpdateOrder(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody Order order
+        @NotNull @RequestBody OrderDTO orderDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Order partially : {}, {}", id, order);
-        if (order.getId() == null) {
+        log.debug("REST request to partial update Order partially : {}, {}", id, orderDTO);
+        if (orderDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        if (!Objects.equals(id, order.getId())) {
+        if (!Objects.equals(id, orderDTO.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
@@ -145,7 +149,7 @@ public class OrderResource {
                     return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
                 }
 
-                Mono<Order> result = orderService.partialUpdate(order);
+                Mono<OrderDTO> result = orderService.partialUpdate(orderDTO);
 
                 return result
                     .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
@@ -166,7 +170,7 @@ public class OrderResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of orders in body.
      */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<Order>>> getAllOrders(
+    public Mono<ResponseEntity<List<OrderDTO>>> getAllOrders(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
@@ -190,20 +194,20 @@ public class OrderResource {
     /**
      * {@code GET  /orders/:id} : get the "id" order.
      *
-     * @param id the id of the order to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the order, or with status {@code 404 (Not Found)}.
+     * @param id the id of the orderDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the orderDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Order>> getOrder(@PathVariable("id") Long id) {
+    public Mono<ResponseEntity<OrderDTO>> getOrder(@PathVariable("id") Long id) {
         log.debug("REST request to get Order : {}", id);
-        Mono<Order> order = orderService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(order);
+        Mono<OrderDTO> orderDTO = orderService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(orderDTO);
     }
 
     /**
      * {@code DELETE  /orders/:id} : delete the "id" order.
      *
-     * @param id the id of the order to delete.
+     * @param id the id of the orderDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")

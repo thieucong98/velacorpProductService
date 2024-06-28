@@ -1,7 +1,6 @@
 package com.velacorp.product.repository;
 
 import com.velacorp.product.domain.OrderItem;
-import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -15,6 +14,17 @@ import reactor.core.publisher.Mono;
 @SuppressWarnings("unused")
 @Repository
 public interface OrderItemRepository extends ReactiveCrudRepository<OrderItem, Long>, OrderItemRepositoryInternal {
+    Flux<OrderItem> findAllBy(Pageable pageable);
+
+    @Override
+    Mono<OrderItem> findOneWithEagerRelationships(Long id);
+
+    @Override
+    Flux<OrderItem> findAllWithEagerRelationships();
+
+    @Override
+    Flux<OrderItem> findAllWithEagerRelationships(Pageable page);
+
     @Query("SELECT * FROM order_item entity WHERE entity.order_id = :id")
     Flux<OrderItem> findByOrder(Long id);
 
@@ -32,6 +42,8 @@ public interface OrderItemRepository extends ReactiveCrudRepository<OrderItem, L
 
     @Override
     Mono<Void> deleteById(Long id);
+
+    Mono<Void> deleteByOrderId(Long id);
 }
 
 interface OrderItemRepositoryInternal {
@@ -44,4 +56,12 @@ interface OrderItemRepositoryInternal {
     Mono<OrderItem> findById(Long id);
     // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
     // Flux<OrderItem> findAllBy(Pageable pageable, Criteria criteria);
+
+    Mono<OrderItem> findOneWithEagerRelationships(Long id);
+
+    Flux<OrderItem> findAllWithEagerRelationships();
+
+    Flux<OrderItem> findAllWithEagerRelationships(Pageable page);
+
+    Mono<Void> deleteById(Long id);
 }
